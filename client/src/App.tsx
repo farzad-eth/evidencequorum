@@ -1,34 +1,22 @@
 /**
  * Signal Room design reminder: one focused observability canvas with a persistent dark rail,
  * Quorum Lime state language, and inspectable interactions rather than generic marketing UI.
+ * Runtime surface is intentionally minimal: no theme persistence or template UI providers.
  */
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Toaster } from "sonner";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
 
 function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
-  );
+  return window.location.pathname === "/" ? <Home /> : <NotFound />;
 }
 
 export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <Toaster theme="dark" />
+      <Router />
     </ErrorBoundary>
   );
 }

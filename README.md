@@ -56,3 +56,7 @@ The showcase defaults to the deployed Studio address [`0xec5BB6E6f7B950914d55D34
 ## Development safeguards
 
 The direct tests use deterministic web and LLM mocks. The client distinguishes packet validation from a submitted transaction, shows every returned transaction hash, waits for an accepted receipt, checks the execution result, and re-reads canonical state. See [`docs/CONTRACT_INTERFACE.md`](docs/CONTRACT_INTERFACE.md) for the complete interface mapping.
+
+## Security and reproducibility
+
+Read [`SECURITY.md`](SECURITY.md) before integrating the public write methods, and see [`SECURITY_AUDIT_2026-08.md`](SECURITY_AUDIT_2026-08.md) for the pre-submission review, known design limitations, and verification results.

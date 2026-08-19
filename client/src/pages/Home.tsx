@@ -74,6 +74,29 @@ const initialSources = [
   "https://",
 ];
 
+function isPublicHttpsSource(value: string): boolean {
+  try {
+    const url = new URL(value.trim());
+    const host = url.hostname.toLowerCase();
+    if (url.protocol !== "https:" || !host || host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) return false;
+    if (host === "::1" || host === "[::1]") return false;
+
+    const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (!ipv4) return true;
+    const octets = ipv4.slice(1).map(Number);
+    if (octets.some((octet) => octet > 255)) return false;
+    const [first, second] = octets;
+    return !(
+      first === 0 || first === 10 || first === 127 || first >= 224 ||
+      (first === 169 && second === 254) ||
+      (first === 172 && second >= 16 && second <= 31) ||
+      (first === 192 && second === 168)
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function Home() {
   const [activeState, setActiveState] = useState<keyof typeof states>("consensus");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -90,7 +113,16 @@ export default function Home() {
   const [showPacket, setShowPacket] = useState(false);
   const current = states[activeState];
 
-  const validSources = useMemo(() => sources.filter((source) => source.startsWith("https://") && source.includes(".")), [sources]);
+  const validSources = useMemo(() => {
+    const seen = new Set<string>();
+    return sources.filter((source) => {
+      if (!isPublicHttpsSource(source)) return false;
+      const canonical = source.trim();
+      if (seen.has(canonical)) return false;
+      seen.add(canonical);
+      return true;
+    });
+  }, [sources]);
   const statusLabel = dossierStatus === "writing" ? "WALLET / PENDING" : dossierStatus === "error" ? "RETRY NEEDED" : dossierStatus === "challenged" ? "CHALLENGED" : dossierStatus === "accepted" ? liveAttestation?.status ?? "ACCEPTED" : dossierStatus === "ready" ? "READY TO ATTEST" : readStatus === "loading" ? "READING GENLAYER" : "DRAFT";
   const statusColor = dossierStatus === "error" || dossierStatus === "challenged" ? "coral" : dossierStatus === "accepted" ? "lime" : "cyan";
 
@@ -121,7 +153,7 @@ export default function Home() {
   const prepareDossier = () => {
     if (validSources.length < 2 || claim.trim().length < 20) {
       setDossierStatus("draft");
-      toast.error("A live attestation needs a proposition of 20+ characters and at least two HTTPS sources.");
+      toast.error("A live attestation needs a proposition of 20+ characters and at least two distinct public HTTPS sources.");
       return;
     }
     setDossierStatus("ready");
@@ -195,7 +227,7 @@ export default function Home() {
         <div className="container workspace-grid">
           <div className="workspace-intro"><div className="section-kicker">THE WORKSPACE <span>— 01</span></div><h2>Make a claim.<br /><em>Keep the trail.</em></h2><p>Build an evidence packet, then submit it through an explicit browser-wallet transaction. The dossier reads canonical contract state before and after every accepted write.</p><div className="workspace-note"><span className={`state-marker ${readStatus === "error" ? "coral" : readStatus === "ready" ? "lime" : "cyan"}`} /> <strong>{readStatus === "ready" ? "LIVE READ CONNECTED" : readStatus === "error" ? "LIVE READ ERROR" : "READING CONTRACT"}</strong><span>{readStatus === "ready" ? `${liveCount} canonical record${liveCount === 1 ? "" : "s"} loaded from GenLayer` : liveError ?? "Querying deployed Studio contract"}</span></div><div className="panel-actions"><button className="button button-small" onClick={() => void refreshLiveState()} disabled={readStatus === "loading"}><RotateCcw size={15} /> Refresh live state</button></div><a className="text-link" href={explorerUrl} target="_blank" rel="noreferrer">Inspect deployed contract <ExternalLink size={15} /></a></div>
           <div className="dossier-panel"><div className="panel-top"><div><span className="panel-kicker">DOSSIER / NEW</span><h3>Evidence intake</h3></div><span className="panel-state"><i className={`state-marker ${statusColor}`} /> {statusLabel}</span></div><label className="field-label" htmlFor="claim">PROPOSITION</label><textarea id="claim" className="claim-input" value={claim} onChange={(event) => { setClaim(event.target.value); setDossierStatus("draft"); }} />
-            <div className="source-header"><label className="field-label">SOURCE SET / {sources.length.toString().padStart(2, "0")}</label><span className="source-hint">HTTPS ONLY · 2 MINIMUM</span></div>
+            <div className="source-header"><label className="field-label">SOURCE SET / {sources.length.toString().padStart(2, "0")}</label><span className="source-hint">PUBLIC HTTPS · 2 MINIMUM</span></div>
             <div className="source-list">{sources.map((source, index) => <div className="source-row" key={`${index}-${source}`}><span className="source-index">0{index + 1}</span><Link2 size={14} /><input aria-label={`Evidence source ${index + 1}`} value={source} onChange={(event) => updateSource(index, event.target.value)} /><button className="icon-button" onClick={() => removeSource(index)} aria-label={`Remove source ${index + 1}`} disabled={sources.length <= 2}><X size={14} /></button></div>)}</div>
             <div className="panel-actions"><button className="button button-primary" onClick={prepareDossier}><ShieldCheck size={15} /> Validate packet</button><button className="button button-small" onClick={addSource} disabled={sources.length >= 8}><Plus size={15} /> Add source</button></div><div className="panel-footer"><span><LockKeyhole size={13} /> preflight only / no state is written</span><span>{validSources.length} valid sources</span></div>
           </div>
