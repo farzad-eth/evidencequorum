@@ -1,0 +1,5 @@
+# Python 3.12+ is required by the current GenLayer testing toolchain.
+genlayer-py==0.16.3
+genlayer-test==0.29.2
+pytest==9.1.1
+
