@@ -1,0 +1,36 @@
+name: Publish security-hardened EvidenceQuorum source
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download and verify reviewed source archive
+        run: |
+          set -euo pipefail
+          archive=/tmp/evidencequorum-security-hardened-source.tar.gz
+          curl --fail --location --proto '=https' --tlsv1.2 --output "$archive" "https://files.manuscdn.com/user_upload_by_module/session_file/310419663026813927/eqHWBDcqFEDtYOkZ.gz"
+          echo "fb8d19f00f520cea5d81127f58bc35919e4bc38750cc049642ef9220a2c8a974  $archive" | sha256sum --check --status
+          mkdir /tmp/evidencequorum-source
+          tar -xzf "$archive" -C /tmp/evidencequorum-source
+          test -f /tmp/evidencequorum-source/contracts/evidence_quorum.py
+          test -f /tmp/evidencequorum-source/tests/direct/test_evidence_quorum.py
+          test -f /tmp/evidencequorum-source/tests/integration/test_evidence_quorum_studio.py
+          test -f /tmp/evidencequorum-source/SECURITY_AUDIT_2026-08.md
+          test ! -d /tmp/evidencequorum-source/.github
+      - name: Replace source tree with reviewed archive
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git rm -r .
+          cp -a /tmp/evidencequorum-source/. .
+          git add -A
+          git config user.name "farzad-eth"
+          git config user.email "farzad-eth@users.noreply.github.com"
+          git commit -m "Publish audited EvidenceQuorum source package"
+          git push
