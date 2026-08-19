@@ -15,7 +15,7 @@ jobs:
           persist-credentials: true
       - name: Replace flattened bundle with verified source project
         env:
-          ARCHIVE_URL: https://files.manuscdn.com/user_upload_by_module/session_file/310419663026813927/wyiHrXtxGPseEIkM.zip
+          ARCHIVE_URL: https://files.manuscdn.com/user_upload_by_module/session_file/310419663026813927/zhVHjuZgJQrYRttQ.zip
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 "$ARCHIVE_URL" --output /tmp/evidencequorum-source.zip
