@@ -19,9 +19,10 @@ EvidenceQuorum is a complete GenLayer application for source-grounded, challenge
 
 | Method | Type | Purpose |
 |---|---|---|
-| `attest(claim, sources)` | write | Renders 2–8 HTTPS sources, reaches constrained validator consensus, and stores a durable attestation. |
+| `attest(claim, sources)` | write | Renders 2–8 distinct HTTPS sources, requires evidence-grounded leader/validator agreement, and stores a durable attestation plus immutable bounded evidence captures. |
 | `get_attestation(claim_id)` | view | Returns the canonical decision record. |
-| `get_sources(claim_id)` | view | Returns the source snapshot bound to the record. |
+| `get_evidence(claim_id)` | view | Returns the immutable bounded source captures, direct quotations, and material stances bound to the record. |
+| `get_sources(claim_id)` | view | Compatibility view returning the source URLs bound to the record. |
 | `challenge(claim_id)` | write | Preserves history while marking an existing record as challenged. |
 | `count()` | view | Returns the current number of attestations. |
 
@@ -49,13 +50,15 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-## Deployed Studio contract
+## Deployment status
 
-The showcase defaults to the deployed Studio address [`0xec5BB6E6f7B950914d55D34d931e0032935c8e89`](https://explorer-studio.genlayer.com/address/0xec5BB6E6f7B950914d55D34d931e0032935c8e89). A browser wallet is required only for `attest` and `challenge`; all view calls use a separate unauthenticated GenLayerJS read client.
+The evidence-bound EvidenceQuorum source is finalized on GenLayer Studio at [`0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8`](https://explorer-studio.genlayer.com/address/0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8). Deployment transaction [`0x051f42b8b6b19c2a7288ea5c5d148180c64c93c4869b108339426dbb91cf085f`](https://explorer-studio.genlayer.com/tx/0x051f42b8b6b19c2a7288ea5c5d148180c64c93c4869b108339426dbb91cf085f) finalized with successful GenVM execution and accepted consensus. A browser wallet is required only for `attest` and `challenge`; all view calls use a separate unauthenticated GenLayerJS read client.
+
+The prior URL-only deployment at `0xec5BB6E6f7B950914d55D34d931e0032935c8e89` is retained only as historical provenance and must not be presented as implementing this evidence-bound revision.
 
 ## Development safeguards
 
-The direct tests use deterministic web and LLM mocks. The client distinguishes packet validation from a submitted transaction, shows every returned transaction hash, waits for an accepted receipt, checks the execution result, and re-reads canonical state. See [`docs/CONTRACT_INTERFACE.md`](docs/CONTRACT_INTERFACE.md) for the complete interface mapping.
+The Direct Mode suite uses deterministic web and LLM mocks. It includes semantic rejection cases where validators independently observe irrelevant or contradicting evidence, plus a fabricated-citation case. The client distinguishes packet validation from a submitted transaction, shows every returned transaction hash, waits for an accepted receipt, checks the execution result, and re-reads canonical state. See [`docs/CONTRACT_INTERFACE.md`](docs/CONTRACT_INTERFACE.md) for the complete interface mapping.
 
 ## Security and reproducibility
 

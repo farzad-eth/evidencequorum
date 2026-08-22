@@ -52,3 +52,13 @@ The missing dependency patch was restored as GitHub commit `c3b170a` (`Create wo
 The `c3b170a` Vercel production deployment is **Ready** at `https://evidencequorum-5srq6cvhz-abc-e8ca.vercel.app`, with the Production aliases `https://eq-proof.vercel.app/` and `https://evidencequorum-showcase.vercel.app/` attached. The next step is a browser-level check that the public alias exposes the live GenLayer contract state rather than the previous local-only workflow.
 
 Public browser verification at `https://eq-proof.vercel.app/` completed successfully. The site resolves the deployed GenLayerJS `count()` read to **0 canonical records**, displays `LIVE READ CONNECTED`, identifies the contract `0xec…8e89`, and clearly labels preflight as non-writing while reserving `attest` and `challenge` for explicit browser-wallet transactions.
+
+The security-hardened source package was subsequently published as GitHub commit `e1eb941` (`Publish audited EvidenceQuorum source package`). Vercel must now be verified against this same commit before the public site is cited in a corrected contribution.
+
+Vercel has deployed the security-hardened source commit `e1eb941` successfully. Its production deployment is `https://evidencequorum-mn7pv5xcd-abc-e8ca.vercel.app`; both `https://eq-proof.vercel.app/` and `https://evidencequorum-showcase.vercel.app/` are attached Production domains. The public alias now needs a browser-level live-read verification from this exact deployment.
+
+Public browser verification of `https://eq-proof.vercel.app/` from commit `e1eb941` is complete. The page reports `LIVE GENLAYER READ`, `CONTRACT STATE EMPTY`, and `0 canonical records`, as well as the connected read status: `0 canonical records loaded from GenLayer`. It keeps packet validation explicitly non-writing and limits state-changing actions to browser-wallet `attest` and `challenge` transactions.
+
+## Evidence-grounded contract deployment — 2026-08-22
+
+The evidence-bound EvidenceQuorum revision was deployed from the verified source to GenLayer Studio at `0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8`. Deployment transaction `0x051f42b8b6b19c2a7288ea5c5d148180c64c93c4869b108339426dbb91cf085f` finalized successfully after accepted consensus. Explorer confirms the complete source, including independent validator-side evidence assessment and `get_evidence`, and `count()` returns `0` on the new empty contract. The source and static client now target this address; a fresh Vercel build must be published and verified before the public website is used as corrected-contribution evidence.
