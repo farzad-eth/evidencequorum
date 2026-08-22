@@ -14,6 +14,7 @@ EvidenceQuorum is a complete GenLayer application for source-grounded, challenge
 | [`deploy/001_deploy_evidence_quorum.ts`](deploy/001_deploy_evidence_quorum.ts) | Reproducible GenLayer CLI deploy script. |
 | [`client`](client) | React/Vite evidence-dossier app with GenLayerJS read and wallet-write paths. |
 | [`docs/CONTRACT_INTERFACE.md`](docs/CONTRACT_INTERFACE.md) | Exact mapping between UI actions and contract methods. |
+| [`docs/FINAL_GENLAYER_COMPLIANCE_AUDIT.md`](docs/FINAL_GENLAYER_COMPLIANCE_AUDIT.md) | Official-docs crosswalk, public verification results, and accurately stated reviewer-risk disclosures. |
 
 ## Contract methods
 

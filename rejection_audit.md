@@ -1,4 +1,20 @@
-# EvidenceQuorum Rejection Audit
+# Historical Rejection Record and Resolution
+
+> **Scope notice — read first:** The findings below describe the original rejected submission before source repair and evidence-grounded redesign. They are preserved as historical context and are **not** a description of the current contract, source repository, or production client.
+
+## Final resolution at a glance
+
+| Original finding | Finalized resolution |
+|---|---|
+| Public source did not include the claimed contract and tests. | `contracts/evidence_quorum.py`, Direct Mode and Studio Mode tests, manifests, build instructions, interface documentation, and `SECURITY.md` are now published in the source repository. |
+| The client only changed local state. | GenLayerJS reads `count`, `get_attestation`, `get_sources`, and `get_evidence`; `attest` and `challenge` are explicit browser-wallet writes with accepted-receipt checks and canonical-state refresh. |
+| Validators accepted shape-valid payloads without source assessment. | Leader and validators independently render and assess the same bounded URL set; direct quotations are validated against captures; the derived decision status and material-source stance must agree; immutable evidence captures are exposed through `get_evidence`. |
+
+The current reviewer path starts with the [README](README.md), [contract interface map](docs/CONTRACT_INTERFACE.md), finalized [Studio Explorer contract](https://explorer-studio.genlayer.com/address/0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8), and production client at [eq-proof.vercel.app](https://eq-proof.vercel.app/). The retired address `0xec5BB6E6f7B950914d55D34d931e0032935c8e89` is historical provenance only and does **not** implement the evidence-bound revision.
+
+---
+
+## Archived initial audit
 
 ## What reviewers were able to verify
 

@@ -1,4 +1,23 @@
-# Deployment rename
+# EvidenceQuorum Deployment Record
+
+> **Current evidence, 22 August 2026:** The final evidence-bound EvidenceQuorum release is deployed, source-published, and connected to the live client. The dated notes below are an **archived troubleshooting history** and must not be used to evaluate the current implementation.
+
+| Evidence item | Finalized value |
+|---|---|
+| Production client | [https://eq-proof.vercel.app/](https://eq-proof.vercel.app/) |
+| Public source repository | [https://github.com/farzad-eth/evidencequorum](https://github.com/farzad-eth/evidencequorum) (`main`) |
+| Finalized Studio contract | [`0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8`](https://explorer-studio.genlayer.com/address/0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8) |
+| Deploy transaction | [`0x051f42b8b6b19c2a7288ea5c5d148180c64c93c4869b108339426dbb91cf085f`](https://explorer-studio.genlayer.com/tx/0x051f42b8b6b19c2a7288ea5c5d148180c64c93c4869b108339426dbb91cf085f) |
+| Result | Finalized; GenVM execution succeeded; consensus accepted |
+| Client behavior | Live `count()` read is zero; only `attest` and `challenge` begin explicit wallet-backed writes |
+
+The finalized contract independently renders and assesses 2–8 bounded HTTPS sources, validates quotations against captured text, compares a derived decision/material-source signature across nodes, and stores the leader-observed URL, bounded capture, direct quote, and stance as immutable evidence JSON. The repository contains seven Direct Mode semantic tests, one Studio deployment smoke test, the exact interface map, and security/reproducibility documentation.
+
+The retired URL-only contract address `0xec5BB6E6f7B950914d55D34d931e0032935c8e89` and the prior flat-bundle/Vercel incidents below are historical provenance only. They do **not** describe the current evidence-bound contract or client.
+
+---
+
+## Archived deployment chronology
 
 The GitHub repository was renamed to https://github.com/farzad-eth/evidencequorum.
 
