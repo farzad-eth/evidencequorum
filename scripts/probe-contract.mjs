@@ -1,7 +1,7 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 
-const address = "0xec5BB6E6f7B950914d55D34d931e0032935c8e89";
+const address = "0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8";
 const client = createClient({ chain: studionet });
 
 try {
