@@ -9,7 +9,7 @@ import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
 
 export const EVIDENCEQUORUM_ADDRESS =
   (import.meta.env.VITE_EVIDENCEQUORUM_CONTRACT_ADDRESS as `0x${string}` | undefined) ??
-  "0xec5BB6E6f7B950914d55D34d931e0032935c8e89";
+  "0x11Bf9d2268Eccb8539A17528586E324b1cFDdbC8";
 
 type WalletRequest = {
   method: string;
@@ -37,6 +37,14 @@ export type CanonicalAttestation = {
   challenged: boolean;
   revision: number;
   sources: string[];
+  evidence: EvidenceSnapshot[];
+};
+
+export type EvidenceSnapshot = {
+  url: string;
+  capturedText: string;
+  materialQuote: string;
+  stance: "SUPPORTS" | "REFUTES" | "";
 };
 
 export type LiveContractState = {
@@ -65,7 +73,31 @@ function asRecord(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-function normaliseAttestation(claimId: string, value: unknown, sources: unknown): CanonicalAttestation {
+function normaliseEvidence(value: unknown): EvidenceSnapshot[] {
+  let raw: unknown = value;
+  if (typeof value === "string") {
+    try {
+      raw = JSON.parse(value);
+    } catch {
+      throw new Error("GenLayer returned an unreadable immutable evidence snapshot.");
+    }
+  }
+  if (!Array.isArray(raw)) {
+    throw new Error("GenLayer returned an invalid immutable evidence snapshot.");
+  }
+  return raw.map((item) => {
+    const evidence = asRecord(item);
+    const stance = String(evidence.stance ?? "");
+    return {
+      url: String(evidence.url ?? ""),
+      capturedText: String(evidence.captured_text ?? ""),
+      materialQuote: String(evidence.material_quote ?? ""),
+      stance: stance === "SUPPORTS" || stance === "REFUTES" ? stance : "",
+    };
+  });
+}
+
+function normaliseAttestation(claimId: string, value: unknown, sources: unknown, evidence: unknown): CanonicalAttestation {
   const record = asRecord(value);
   return {
     claimId,
@@ -78,6 +110,7 @@ function normaliseAttestation(claimId: string, value: unknown, sources: unknown)
     challenged: Boolean(record.challenged),
     revision: toNumber(record.revision),
     sources: Array.isArray(sources) ? sources.map(String) : [],
+    evidence: normaliseEvidence(evidence),
   };
 }
 
@@ -125,7 +158,7 @@ export async function readLiveContractState(): Promise<LiveContractState> {
   if (count <= 0) return { count: 0, latest: null };
 
   const claimId = `claim-${count - 1}`;
-  const [record, sources] = await Promise.all([
+  const [record, sources, evidence] = await Promise.all([
     readClient.readContract({
       address: EVIDENCEQUORUM_ADDRESS,
       functionName: "get_attestation",
@@ -138,9 +171,15 @@ export async function readLiveContractState(): Promise<LiveContractState> {
       args: [claimId],
       jsonSafeReturn: true,
     }),
+    readClient.readContract({
+      address: EVIDENCEQUORUM_ADDRESS,
+      functionName: "get_evidence",
+      args: [claimId],
+      jsonSafeReturn: true,
+    }),
   ]);
 
-  return { count, latest: normaliseAttestation(claimId, record, sources) };
+  return { count, latest: normaliseAttestation(claimId, record, sources, evidence) };
 }
 
 export async function submitAttestation(claim: string, sources: string[]): Promise<ContractWrite> {
